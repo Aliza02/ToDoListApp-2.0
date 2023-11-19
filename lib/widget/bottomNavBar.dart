@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'package:todolistapp/view/completed_task.dart';
 import '../constants/colors.dart';
 
 class bottomNavBar extends StatelessWidget {
@@ -17,15 +18,17 @@ class bottomNavBar extends StatelessWidget {
         children: [
           IconButton(
             icon: const Icon(
-              Icons.edit,
+              Icons.list,
               color: AppColors.lightblue,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Get.to(() => completedTask());
+            },
           ),
           IconButton(
             onPressed: () {},
             icon: const Icon(
-              Icons.circle,
+              Icons.checklist_outlined,
               color: AppColors.lightblue,
             ),
           ),

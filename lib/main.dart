@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todolistapp/view/addTask.dart';
-import 'package:todolistapp/view/taskList.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:todolistapp/view/display_task.dart';
+import 'package:todolistapp/view/add_Task.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,14 +13,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: addTask(),
-      // SafeArea(
-      //   child: Scaffold(
-      //     body: Text('Hello World'),
-      //   ),
-      // ),
+      home: displayTask(),
     );
   }
 }

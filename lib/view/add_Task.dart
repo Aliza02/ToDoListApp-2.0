@@ -7,8 +7,8 @@ import '../constants/colors.dart';
 import '../controller/taskController.dart';
 import '../model/task.dart';
 
-class taskList extends StatelessWidget {
-  taskList({super.key});
+class add_Task extends StatelessWidget {
+  add_Task({super.key});
   final taskcontroller = Get.put(taskController());
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class taskList extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppColors.lightblue,
-        body: Container(
+        body: SizedBox(
           width: width,
           height: height,
           child: Column(
@@ -50,13 +50,13 @@ class taskList extends StatelessWidget {
                   ),
                 ),
               ),
-              // Spacer(),
+
               Container(
                 width: width * 0.4,
                 height: height * 0.07,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.grey,
                       blurRadius: 5.0,
@@ -78,7 +78,7 @@ class taskList extends StatelessWidget {
                       Task(taskcontroller.taskTitle.text),
                     );
                     taskcontroller.taskTitle.clear();
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   icon: Icon(Icons.add),
                   label: Text(

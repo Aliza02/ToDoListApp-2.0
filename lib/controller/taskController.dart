@@ -5,10 +5,15 @@ import '../model/task.dart';
 
 class taskController extends GetxController {
   List tasks = <Task>[].obs;
+  List completedTask = <Task>[].obs;
 
   final TextEditingController taskTitle = TextEditingController();
 
   void addTask(Task newTask) {
     tasks.add(newTask);
+  }
+
+  void addCompletedTask(Task completedtask) {
+    completedTask.add(completedtask);
   }
 }

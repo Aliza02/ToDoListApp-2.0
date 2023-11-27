@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todolistapp/controller/taskController.dart';
+import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/view/completed_task.dart';
 import '../constants/colors.dart';
 
 class bottomNavBar extends StatelessWidget {
-  const bottomNavBar({super.key});
+  bottomNavBar({super.key});
+  final taskcontroller = Get.put(taskController());
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +24,9 @@ class bottomNavBar extends StatelessWidget {
               Icons.list,
               color: AppColors.lightblue,
             ),
-            onPressed: () {
+            onPressed: () async {
               Get.to(() => completedTask());
+              
             },
           ),
           IconButton(

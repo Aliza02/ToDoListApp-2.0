@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+
 import 'package:get/get.dart';
+import 'package:todolistapp/database/database_helper.dart';
+import 'package:todolistapp/view/display_task.dart';
 
 import '../constants/colors.dart';
 import '../controller/taskController.dart';
-import '../model/task.dart';
 
 class add_Task extends StatelessWidget {
   add_Task({super.key});
   final taskcontroller = Get.put(taskController());
+  final dbHelper = DatabaseHelper();
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -50,7 +52,6 @@ class add_Task extends StatelessWidget {
                   ),
                 ),
               ),
-
               Container(
                 width: width * 0.4,
                 height: height * 0.07,
@@ -73,12 +74,25 @@ class add_Task extends StatelessWidget {
                     ),
                     shadowColor: Colors.grey,
                   ),
-                  onPressed: () {
-                    taskcontroller.addTask(
-                      Task(taskcontroller.taskTitle.text),
-                    );
+                  onPressed: () async {
+                    // DatabaseHelper.insert;
+                    Map<String, String> row = {
+                      DatabaseHelper.task: taskcontroller.taskTitle.text,
+                      DatabaseHelper.status: 'pending'
+                    };
+
+                    final id = await dbHelper.insert(row);
+
+                    // taskcontroller.addTask(
+                    //   Task(taskcontroller.taskTitle.text,id,'pending'),
+                    // );
                     taskcontroller.taskTitle.clear();
-                    Get.back();
+                  
+                  
+                  
+                    
+
+                    Get.off(() => displayTask());
                   },
                   icon: Icon(Icons.add),
                   label: Text(

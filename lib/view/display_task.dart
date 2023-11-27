@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:todolistapp/database/database_helper.dart';
+import 'package:todolistapp/model/task.dart';
 
 import 'package:todolistapp/view/add_Task.dart';
+import 'package:todolistapp/widget/list_item.dart';
 
 import '../constants/colors.dart';
 import '../widget/bottomNavBar.dart';
@@ -17,7 +20,47 @@ class displayTask extends StatefulWidget {
 
 class _displayTaskState extends State<displayTask> {
   final taskcontroller = Get.put(taskController());
-  bool isChecked = false;
+  static GlobalKey<AnimatedListState> listKey = GlobalKey();
+  List<Task> alltasks = [];
+  bool fetching = true;
+  void removeTask(int index) {
+    // taskcontroller.completedTask.add(taskcontroller.tasks[index]);
+    listKey.currentState!.removeItem(
+        index,
+        (context, animation) => list_item(
+            animation: animation,
+            index: index,
+            taskName: taskcontroller.tasks[index].name,
+            onComplete: () {}));
+    taskcontroller.tasks.removeAt(index);
+  }
+
+  void insertitem() {
+    listKey.currentState!.insertItem(
+      1,
+      duration: Duration(milliseconds: 600),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    taskcontroller.tasks = await DatabaseHelper.queryAllRows();
+
+    setState(() {
+      taskcontroller.fetching.value = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,7 +77,7 @@ class _displayTaskState extends State<displayTask> {
           child: const Icon(Icons.add),
         ),
         backgroundColor: AppColors.lightblue,
-        bottomNavigationBar: const bottomNavBar(),
+        bottomNavigationBar: bottomNavBar(),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: SizedBox(
@@ -65,93 +108,34 @@ class _displayTaskState extends State<displayTask> {
                     ),
                   ),
                 ),
-                SingleChildScrollView(
-                  child: Obx(
-                    () => ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: taskcontroller.tasks.length,
-                      itemBuilder: (context, index) {
-                        return Slidable(
-                          endActionPane: ActionPane(
-                            motion: const ScrollMotion(),
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  taskcontroller.addCompletedTask(
-                                      taskcontroller.tasks[index]);
-                                  taskcontroller.tasks.removeAt(index);
+                Obx(
+                  () => !taskcontroller.fetching.value
+                      ? AnimatedList(
+                          key: listKey,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          initialItemCount: taskcontroller.tasks.length,
+                          itemBuilder: (context, index, animation) {
+                            return list_item(
+                                animation: animation,
+                                onComplete: () {
+                                  removeTask(index);
                                 },
-                                child: Container(
-                                  width: Get.width * 0.15,
-                                  height: Get.height * 0.08,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.bluegrey,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.check,
-                                    color: AppColors.lightblue,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: Get.width * 0.02,
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  taskcontroller.tasks.removeAt(index);
-                                },
-                                child: Container(
-                                  width: Get.width * 0.15,
-                                  height: Get.height * 0.08,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.bluegrey,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.delete,
-                                    color: AppColors.lightblue,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          child: Container(
-                            height: Get.height * 0.09,
-                            margin: EdgeInsets.symmetric(
-                              vertical: Get.width * 0.01,
-                              horizontal: Get.width * 0.05,
-                            ),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  taskcontroller.tasks[index].name,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.bluegrey,
-                                    fontSize: Get.width * 0.06,
-                                  ),
-                                ),
-                              ],
+                                index: index,
+                                taskName: taskcontroller.tasks[index].name);
+                          },
+                        )
+                      : Container(
+                          margin: EdgeInsets.only(top: Get.height * 0.24),
+                          child: Text(
+                            'No Task to Display',
+                            style: TextStyle(
+                              fontSize: Get.width * 0.07,
+                              color: Colors.grey,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                        ),
                 ),
               ],
             ),

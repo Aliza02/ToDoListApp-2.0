@@ -6,6 +6,7 @@ import '../model/task.dart';
 class taskController extends GetxController {
   List tasks = <Task>[].obs;
   List completedTask = <Task>[].obs;
+  RxBool fetching = true.obs;
 
   final TextEditingController taskTitle = TextEditingController();
 

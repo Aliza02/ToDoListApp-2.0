@@ -58,7 +58,7 @@ class _completedTaskState extends State<completedTask> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: taskcontroller.completedTask.length,
+                  itemCount: taskcontroller.tasks.length,
                   itemBuilder: (context, index) {
                     return Container(
                       height: Get.height * 0.09,
@@ -76,7 +76,7 @@ class _completedTaskState extends State<completedTask> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            taskcontroller.completedTask[index].name,
+                            taskcontroller.tasks[index].name,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: AppColors.bluegrey,

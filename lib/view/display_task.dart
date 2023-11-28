@@ -20,25 +20,38 @@ class displayTask extends StatefulWidget {
 
 class _displayTaskState extends State<displayTask> {
   final taskcontroller = Get.put(taskController());
-  static GlobalKey<AnimatedListState> listKey = GlobalKey();
+  final GlobalKey<AnimatedListState> listKey = GlobalKey();
   List<Task> alltasks = [];
   bool fetching = true;
   void removeTask(int index) {
-    // taskcontroller.completedTask.add(taskcontroller.tasks[index]);
+    // print("index $index");
+    // print(taskcontroller.tasks);
+    // print("length ${taskcontroller.tasks.length}");
+    if (index == 0) {
+      index = index;
+    } else {
+      --index;
+    }
+
+    DatabaseHelper.delete(taskcontroller.tasks[index].id);
+    taskcontroller.tasks.removeAt(index);
     listKey.currentState!.removeItem(
         index,
         (context, animation) => list_item(
             animation: animation,
             index: index,
             taskName: taskcontroller.tasks[index].name,
-            onComplete: () {}));
-    taskcontroller.tasks.removeAt(index);
+            onRemove: () {}));
+
+    // print("index $index");
+    // print(taskcontroller.tasks);
+    // print("length ${taskcontroller.tasks.length}");
   }
 
   void insertitem() {
     listKey.currentState!.insertItem(
       1,
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
     );
   }
 
@@ -50,10 +63,11 @@ class _displayTaskState extends State<displayTask> {
 
   void fetchData() async {
     taskcontroller.tasks = await DatabaseHelper.queryAllRows();
-
-    setState(() {
+    if (taskcontroller.tasks.isNotEmpty) {
       taskcontroller.fetching.value = false;
-    });
+    } else {
+      taskcontroller.fetching.value = true;
+    }
   }
 
   @override
@@ -68,77 +82,81 @@ class _displayTaskState extends State<displayTask> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Get.to(
-              () => add_Task(),
-              transition: Transition.leftToRightWithFade,
-            );
+            Get.off(() => add_Task());
+            taskcontroller.fetching.value = true;
           },
           backgroundColor: AppColors.bluegrey,
           child: const Icon(Icons.add),
         ),
         backgroundColor: AppColors.lightblue,
         bottomNavigationBar: bottomNavBar(),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SizedBox(
-            width: Get.width,
-            child: Column(
-              children: [
-                Container(
-                  width: Get.width * 0.8,
-                  height: Get.height * 0.07,
-                  margin: EdgeInsets.only(top: Get.height * 0.08),
-                  child: Text(
-                    'To Do',
-                    style: TextStyle(
-                      fontSize: Get.width * 0.1,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.bluegrey,
-                    ),
+        body: SizedBox(
+          width: Get.width,
+          child: Column(
+            children: [
+              Container(
+                width: Get.width * 0.8,
+                height: Get.height * 0.07,
+                margin: EdgeInsets.only(top: Get.height * 0.08),
+                child: Text(
+                  'To Do',
+                  style: TextStyle(
+                    fontSize: Get.width * 0.1,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.bluegrey,
                   ),
                 ),
-                SizedBox(
-                  width: Get.width * 0.8,
-                  height: Get.height * 0.07,
-                  child: Text(
-                    "Today's Tasks",
-                    style: TextStyle(
-                      fontSize: Get.width * 0.05,
-                      color: Colors.grey,
-                    ),
+              ),
+              SizedBox(
+                width: Get.width * 0.8,
+                height: Get.height * 0.07,
+                child: Text(
+                  "Today's Tasks",
+                  style: TextStyle(
+                    fontSize: Get.width * 0.05,
+                    color: Colors.grey,
                   ),
                 ),
-                Obx(
-                  () => !taskcontroller.fetching.value
-                      ? AnimatedList(
-                          key: listKey,
+              ),
+              Obx(
+                () => !taskcontroller.fetching.value
+                    ? Expanded(
+                        child: SingleChildScrollView(
+                          // clipBehavior: Clip.values[1],
                           scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          initialItemCount: taskcontroller.tasks.length,
-                          itemBuilder: (context, index, animation) {
-                            return list_item(
-                                animation: animation,
-                                onComplete: () {
-                                  removeTask(index);
-                                },
-                                index: index,
-                                taskName: taskcontroller.tasks[index].name);
-                          },
-                        )
-                      : Container(
-                          margin: EdgeInsets.only(top: Get.height * 0.24),
-                          child: Text(
-                            'No Task to Display',
-                            style: TextStyle(
-                              fontSize: Get.width * 0.07,
-                              color: Colors.grey,
-                            ),
+                          child: AnimatedList(
+                            key: listKey,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            initialItemCount: taskcontroller.tasks.length,
+                            itemBuilder: (context, index, animation) {
+                              return list_item(
+                                  animation: animation,
+                                  onRemove: () {
+                                    print(index);
+                                    removeTask(index);
+                                    // print(taskcontroller.tasks.length);
+                                    // taskcontroller.tasks.removeAt(index);
+                                  },
+                                  index: index,
+                                  taskName: taskcontroller.tasks[index].name);
+                            },
                           ),
                         ),
-                ),
-              ],
-            ),
+                      )
+                    : Container(
+                        margin: EdgeInsets.only(top: Get.height * 0.24),
+                        child: Text(
+                          'No Task to Display',
+                          style: TextStyle(
+                            fontSize: Get.width * 0.07,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+              ),
+            ],
           ),
         ),
       ),

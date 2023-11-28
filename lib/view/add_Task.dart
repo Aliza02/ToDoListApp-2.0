@@ -87,10 +87,6 @@ class add_Task extends StatelessWidget {
                     //   Task(taskcontroller.taskTitle.text,id,'pending'),
                     // );
                     taskcontroller.taskTitle.clear();
-                  
-                  
-                  
-                    
 
                     Get.off(() => displayTask());
                   },

@@ -7,14 +7,14 @@ import 'package:todolistapp/database/database_helper.dart';
 
 class list_item extends StatefulWidget {
   final String taskName;
-  final Function onComplete;
+  final Function onRemove;
   final int index;
   final Animation<double> animation;
   const list_item(
       {super.key,
       required this.animation,
       required this.taskName,
-      required this.onComplete,
+      required this.onRemove,
       required this.index});
 
   @override
@@ -58,11 +58,15 @@ class _list_itemState extends State<list_item> {
             ),
             InkWell(
               onTap: () {
-                // taskcontroller.tasks.removeAt(index);
-                DatabaseHelper.delete(taskcontroller.tasks[widget.index].id);
-                widget.onComplete();
-                print(taskcontroller.tasks.length);
-                print('delet');
+                // taskcontroller.tasks.removeAt(widget.index);
+                
+                widget.onRemove();
+
+                if (taskcontroller.tasks.isEmpty) {
+                  taskcontroller.fetching.value = true;
+                }
+                // print(taskcontroller.tasks.length);
+                // print(widget.index);
               },
               child: Container(
                 width: Get.width * 0.15,
@@ -85,19 +89,28 @@ class _list_itemState extends State<list_item> {
           // height: Get.height * 0.09,
           width: Get.width * 0.9,
           padding: EdgeInsets.symmetric(
-              vertical: Get.height * 0.02, horizontal: Get.width * 0.01),
+            vertical: Get.height * 0.02,
+            horizontal: Get.width * 0.01,
+          ),
           margin: EdgeInsets.symmetric(
-            vertical: Get.width * 0.01,
+            vertical: Get.width * 0.02,
             horizontal: Get.width * 0.05,
           ),
           decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(
-              Radius.circular(20),
-            ),
-          ),
+              color: Colors.white,
+              borderRadius: BorderRadius.all(
+                Radius.circular(15),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromARGB(255, 191, 200, 221),
+                  blurRadius: 3.0,
+                  spreadRadius: 1.0,
+                  offset: Offset(2.0, 2.0),
+                ),
+              ]),
           child: Text(
-            widget.taskName,
+            "${widget.taskName} ${widget.index}",
             textAlign: TextAlign.center,
             softWrap: true,
             style: TextStyle(

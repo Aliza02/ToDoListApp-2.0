@@ -34,7 +34,8 @@ class _list_itemState extends State<list_item> {
           children: [
             InkWell(
               onTap: () {
-                print(taskcontroller.tasks[widget.index].id);
+                taskcontroller.onComplete.value = true;
+                widget.onRemove();
                 // taskcontroller.addCompletedTask(taskcontroller.tasks[index]);
                 // taskcontroller.tasks.removeAt(index);
               },
@@ -59,7 +60,7 @@ class _list_itemState extends State<list_item> {
             InkWell(
               onTap: () {
                 // taskcontroller.tasks.removeAt(widget.index);
-                
+                taskcontroller.onRemove.value = true;
                 widget.onRemove();
 
                 if (taskcontroller.tasks.isEmpty) {
@@ -110,7 +111,7 @@ class _list_itemState extends State<list_item> {
                 ),
               ]),
           child: Text(
-            "${widget.taskName} ${widget.index}",
+            widget.taskName,
             textAlign: TextAlign.center,
             softWrap: true,
             style: TextStyle(

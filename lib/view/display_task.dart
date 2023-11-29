@@ -24,17 +24,19 @@ class _displayTaskState extends State<displayTask> {
   List<Task> alltasks = [];
   bool fetching = true;
   void removeTask(int index) {
-    // print("index $index");
-    // print(taskcontroller.tasks);
-    // print("length ${taskcontroller.tasks.length}");
+    if (taskcontroller.onRemove.value == true) {
+      DatabaseHelper.delete(taskcontroller.tasks[index].id);
+    } else {
+      DatabaseHelper.update(
+          taskcontroller.tasks[index].id, taskcontroller.tasks[index].name);
+    }
+
+    taskcontroller.tasks.removeAt(index);
     if (index == 0) {
       index = index;
     } else {
       --index;
     }
-
-    DatabaseHelper.delete(taskcontroller.tasks[index].id);
-    taskcontroller.tasks.removeAt(index);
     listKey.currentState!.removeItem(
         index,
         (context, animation) => list_item(
@@ -42,18 +44,19 @@ class _displayTaskState extends State<displayTask> {
             index: index,
             taskName: taskcontroller.tasks[index].name,
             onRemove: () {}));
-
-    // print("index $index");
-    // print(taskcontroller.tasks);
-    // print("length ${taskcontroller.tasks.length}");
   }
 
-  void insertitem() {
-    listKey.currentState!.insertItem(
-      1,
-      duration: const Duration(milliseconds: 600),
-    );
-  }
+  // void onComplete(int index) async{
+  //   DatabaseHelper.update(taskcontroller.tasks[index].id, taskcontroller.tasks[index].name);
+  //   taskcontroller.tasks.removeAt(index);
+  // }
+
+  // void insertitem() {
+  //   listKey.currentState!.insertItem(
+  //     1,
+  //     duration: const Duration(milliseconds: 600),
+  //   );
+  // }
 
   @override
   void initState() {

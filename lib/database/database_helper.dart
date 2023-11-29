@@ -41,7 +41,18 @@ class DatabaseHelper {
 
   static Future<List<Task>> queryAllRows() async {
     Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(toDoTableName);
+    final List<Map<String, dynamic>> maps = await db
+        .query(toDoTableName, where: '$status = ?', whereArgs: ['pending']);
+    return List.generate(maps.length, (index) {
+      return Task(
+          maps[index]['Task'], maps[index]['id'], maps[index]['status']);
+    });
+  }
+
+  static Future<List<Task>> queryOnCompleteTask() async {
+    Database db = await database;
+    final List<Map<String, dynamic>> maps = await db
+        .query(toDoTableName, where: '$status = ?', whereArgs: ['completed']);
     return List.generate(maps.length, (index) {
       return Task(
           maps[index]['Task'], maps[index]['id'], maps[index]['status']);
@@ -50,6 +61,22 @@ class DatabaseHelper {
 
   static Future<void> delete(int id) async {
     Database db = await database;
-    await db.delete(toDoTableName,  where: '$columnId = ?', whereArgs: [id]);
+    await db.delete(toDoTableName, where: '$columnId = ?', whereArgs: [id]);
   }
+
+  static Future<void> update(int id, String task) async {
+    final row = {
+      'id': id,
+      'status': 'completed',
+      'Task': task,
+    };
+    Database db = await database;
+    await db
+        .update(toDoTableName, row, where: '$columnId = ?', whereArgs: [id]);
+  }
+
+  //  static Future<void> update(int id) async {
+  //   Database db = await database;
+  //   await db.update(toDoTableName, 'ada', where: '$columnId = ?', whereArgs: [id]);
+  // }
 }

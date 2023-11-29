@@ -25,14 +25,13 @@ class bottomNavBar extends StatelessWidget {
               Icons.list,
               color: AppColors.lightblue,
             ),
-            onPressed: () async {
-              
-              Get.to(() => completedTask());
-              
-            },
+            onPressed: () async {},
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              taskcontroller.fetching.value = true;
+              Get.off(() => completedTask());
+            },
             icon: const Icon(
               Icons.checklist_outlined,
               color: AppColors.lightblue,

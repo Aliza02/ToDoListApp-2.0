@@ -7,6 +7,8 @@ class taskController extends GetxController {
   List tasks = <Task>[].obs;
   List completedTask = <Task>[].obs;
   RxBool fetching = true.obs;
+  RxBool onRemove = false.obs;
+  RxBool onComplete = false.obs;
 
   final TextEditingController taskTitle = TextEditingController();
 

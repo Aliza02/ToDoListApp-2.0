@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/controller/taskController.dart';
+import 'package:todolistapp/database/database_helper.dart';
+import 'package:todolistapp/view/display_task.dart';
 
 class completedTask extends StatefulWidget {
   const completedTask({super.key});
@@ -13,13 +15,25 @@ class completedTask extends StatefulWidget {
 class _completedTaskState extends State<completedTask> {
   final taskcontroller = Get.put(taskController());
   @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    taskcontroller.completedTask = await DatabaseHelper.queryOnCompleteTask();
+    taskcontroller.fetching.value = false;
+    print(taskcontroller.completedTask.length);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           leading: InkWell(
             onTap: () {
-              Get.back();
+              Get.off(() => displayTask());
             },
             child: Container(
               margin: EdgeInsets.fromLTRB(
@@ -56,38 +70,42 @@ class _completedTaskState extends State<completedTask> {
                   ),
                 ),
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: taskcontroller.tasks.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      height: Get.height * 0.09,
-                      margin: EdgeInsets.symmetric(
-                        vertical: Get.width * 0.01,
-                        horizontal: Get.width * 0.05,
-                      ),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20),
+              Obx(
+                () => taskcontroller.fetching.value == false
+                    ? Expanded(
+                        child: ListView.builder(
+                          itemCount: taskcontroller.completedTask.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: Get.height * 0.09,
+                              margin: EdgeInsets.symmetric(
+                                vertical: Get.width * 0.01,
+                                horizontal: Get.width * 0.05,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    taskcontroller.completedTask[index].name,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.bluegrey,
+                                      fontSize: Get.width * 0.06,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            taskcontroller.tasks[index].name,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.bluegrey,
-                              fontSize: Get.width * 0.06,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                      )
+                    : Text('asda'),
               ),
             ],
           ),

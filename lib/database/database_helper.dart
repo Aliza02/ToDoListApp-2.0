@@ -39,10 +39,19 @@ class DatabaseHelper {
     return await connection.insert(toDoTableName, data);
   }
 
-  static Future<List<Task>> queryAllRows() async {
+  static Future<List<Task>> queryPendingTasks() async {
     Database db = await database;
     final List<Map<String, dynamic>> maps = await db
         .query(toDoTableName, where: '$status = ?', whereArgs: ['pending']);
+    return List.generate(maps.length, (index) {
+      return Task(
+          maps[index]['Task'], maps[index]['id'], maps[index]['status']);
+    });
+  }
+
+  static Future<List<Task>> queryAllTasks() async {
+    Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(toDoTableName);
     return List.generate(maps.length, (index) {
       return Task(
           maps[index]['Task'], maps[index]['id'], maps[index]['status']);

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/controller/taskController.dart';
 import 'package:todolistapp/database/database_helper.dart';
+import 'package:todolistapp/widget/item_card.dart';
 
 class list_item extends StatefulWidget {
   final String taskName;
@@ -63,8 +64,8 @@ class _list_itemState extends State<list_item> {
                 taskcontroller.onRemove.value = true;
                 widget.onRemove();
 
-                if (taskcontroller.tasks.isEmpty) {
-                  taskcontroller.fetching.value = true;
+                if (taskcontroller.toDotasks.isEmpty) {
+                  // taskcontroller.fetching.value = true;
                 }
                 // print(taskcontroller.tasks.length);
                 // print(widget.index);
@@ -86,39 +87,10 @@ class _list_itemState extends State<list_item> {
             ),
           ],
         ),
-        child: Container(
-          // height: Get.height * 0.09,
-          width: Get.width * 0.9,
-          padding: EdgeInsets.symmetric(
-            vertical: Get.height * 0.02,
-            horizontal: Get.width * 0.01,
-          ),
-          margin: EdgeInsets.symmetric(
-            vertical: Get.width * 0.02,
-            horizontal: Get.width * 0.05,
-          ),
-          decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(
-                Radius.circular(15),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromARGB(255, 191, 200, 221),
-                  blurRadius: 3.0,
-                  spreadRadius: 1.0,
-                  offset: Offset(2.0, 2.0),
-                ),
-              ]),
-          child: Text(
-            widget.taskName,
-            textAlign: TextAlign.center,
-            softWrap: true,
-            style: TextStyle(
-              color: AppColors.bluegrey,
-              fontSize: Get.width * 0.06,
-            ),
-          ),
+        child: item_card(
+          animation: widget.animation,
+          fontSize: Get.width * 0.06,
+          cardText: widget.taskName,
         ),
       ),
     );

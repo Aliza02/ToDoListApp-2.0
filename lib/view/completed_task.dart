@@ -4,6 +4,7 @@ import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/controller/taskController.dart';
 import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/view/display_task.dart';
+import 'package:todolistapp/widget/item_card.dart';
 
 class completedTask extends StatefulWidget {
   const completedTask({super.key});
@@ -14,6 +15,7 @@ class completedTask extends StatefulWidget {
 
 class _completedTaskState extends State<completedTask> {
   final taskcontroller = Get.put(taskController());
+  final GlobalKey<AnimatedListState> listKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -23,7 +25,6 @@ class _completedTaskState extends State<completedTask> {
   void fetchData() async {
     taskcontroller.completedTask = await DatabaseHelper.queryOnCompleteTask();
     taskcontroller.fetching.value = false;
-    print(taskcontroller.completedTask.length);
   }
 
   @override
@@ -33,7 +34,11 @@ class _completedTaskState extends State<completedTask> {
         appBar: AppBar(
           leading: InkWell(
             onTap: () {
-              Get.off(() => displayTask());
+              Get.off(
+                () => const displayTask(),
+                duration: const Duration(seconds: 1),
+                transition: Transition.leftToRightWithFade,
+              );
             },
             child: Container(
               margin: EdgeInsets.fromLTRB(
@@ -73,39 +78,39 @@ class _completedTaskState extends State<completedTask> {
               Obx(
                 () => taskcontroller.fetching.value == false
                     ? Expanded(
-                        child: ListView.builder(
-                          itemCount: taskcontroller.completedTask.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              height: Get.height * 0.09,
-                              margin: EdgeInsets.symmetric(
-                                vertical: Get.width * 0.01,
-                                horizontal: Get.width * 0.05,
-                              ),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(20),
+                        child: taskcontroller.completedTask.isNotEmpty
+                            ? AnimatedList(
+                                key: listKey,
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                initialItemCount:
+                                    taskcontroller.completedTask.length,
+                                itemBuilder: (context, index, animation) {
+                                  return item_card(
+                                    animation: animation,
+                                    cardText: taskcontroller
+                                        .completedTask[index].name,
+                                    fontSize: Get.width * 0.06,
+                                  );
+                                },
+                              )
+                            : Container(
+                                margin: EdgeInsets.only(top: Get.height * 0.24),
+                                child: Text(
+                                  'No Task to Display',
+                                  style: TextStyle(
+                                    fontSize: Get.width * 0.07,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    taskcontroller.completedTask[index].name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: AppColors.bluegrey,
-                                      fontSize: Get.width * 0.06,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
                       )
-                    : Text('asda'),
+                    : const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.bluegrey,
+                        ),
+                      ),
               ),
             ],
           ),

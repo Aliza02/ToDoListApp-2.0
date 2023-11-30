@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import '../model/task.dart';
 
 class taskController extends GetxController {
-  List tasks = <Task>[].obs;
+  List toDotasks = <Task>[].obs;
   List completedTask = <Task>[].obs;
+  List allTasks = <Task>[].obs;
+
   RxBool fetching = true.obs;
   RxBool onRemove = false.obs;
   RxBool onComplete = false.obs;
@@ -13,7 +15,7 @@ class taskController extends GetxController {
   final TextEditingController taskTitle = TextEditingController();
 
   void addTask(Task newTask) {
-    tasks.add(newTask);
+    toDotasks.add(newTask);
   }
 
   void addCompletedTask(Task completedtask) {

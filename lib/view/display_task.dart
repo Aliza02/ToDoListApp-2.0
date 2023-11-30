@@ -24,39 +24,23 @@ class _displayTaskState extends State<displayTask> {
   List<Task> alltasks = [];
   bool fetching = true;
   void removeTask(int index) {
+    String removeItem = taskcontroller.toDotasks[index].name;
     if (taskcontroller.onRemove.value == true) {
-      DatabaseHelper.delete(taskcontroller.tasks[index].id);
+      DatabaseHelper.delete(taskcontroller.toDotasks[index].id);
     } else {
-      DatabaseHelper.update(
-          taskcontroller.tasks[index].id, taskcontroller.tasks[index].name);
+      DatabaseHelper.update(taskcontroller.toDotasks[index].id,
+          taskcontroller.toDotasks[index].name);
     }
 
-    taskcontroller.tasks.removeAt(index);
-    if (index == 0) {
-      index = index;
-    } else {
-      --index;
-    }
+    taskcontroller.toDotasks.removeAt(index);
     listKey.currentState!.removeItem(
         index,
         (context, animation) => list_item(
             animation: animation,
             index: index,
-            taskName: taskcontroller.tasks[index].name,
+            taskName: removeItem,
             onRemove: () {}));
   }
-
-  // void onComplete(int index) async{
-  //   DatabaseHelper.update(taskcontroller.tasks[index].id, taskcontroller.tasks[index].name);
-  //   taskcontroller.tasks.removeAt(index);
-  // }
-
-  // void insertitem() {
-  //   listKey.currentState!.insertItem(
-  //     1,
-  //     duration: const Duration(milliseconds: 600),
-  //   );
-  // }
 
   @override
   void initState() {
@@ -65,12 +49,19 @@ class _displayTaskState extends State<displayTask> {
   }
 
   void fetchData() async {
-    taskcontroller.tasks = await DatabaseHelper.queryAllRows();
-    if (taskcontroller.tasks.isNotEmpty) {
-      taskcontroller.fetching.value = false;
-    } else {
-      taskcontroller.fetching.value = true;
+    taskcontroller.toDotasks = await DatabaseHelper.queryPendingTasks();
+
+    taskcontroller.fetching.value = false;
+    for(int i=0; i<taskcontroller.toDotasks.length; i++){
+    Future.delayed(Duration(milliseconds: 100),(){
+listKey.currentState!.insertItem(i);
+    });  
     }
+   
+    // listKey.currentState!.insertItem(
+    //   0,
+    //   duration: const Duration(seconds: 1),
+    // );
   }
 
   @override
@@ -122,40 +113,45 @@ class _displayTaskState extends State<displayTask> {
                 ),
               ),
               Obx(
-                () => !taskcontroller.fetching.value
+                () => taskcontroller.fetching.value == false
                     ? Expanded(
                         child: SingleChildScrollView(
-                          // clipBehavior: Clip.values[1],
                           scrollDirection: Axis.vertical,
-                          child: AnimatedList(
-                            key: listKey,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            initialItemCount: taskcontroller.tasks.length,
-                            itemBuilder: (context, index, animation) {
-                              return list_item(
-                                  animation: animation,
-                                  onRemove: () {
-                                    print(index);
-                                    removeTask(index);
-                                    // print(taskcontroller.tasks.length);
-                                    // taskcontroller.tasks.removeAt(index);
+                          child: taskcontroller.toDotasks.isNotEmpty
+                              ? AnimatedList(
+                                  key: listKey,
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  initialItemCount:
+                                      taskcontroller.toDotasks.length,
+                                  itemBuilder: (context, index, animation) {
+                                    return list_item(
+                                        animation: animation,
+                                        onRemove: () {
+                                          removeTask(index);
+                                        },
+                                        index: index,
+                                        taskName: taskcontroller
+                                            .toDotasks[index].name);
                                   },
-                                  index: index,
-                                  taskName: taskcontroller.tasks[index].name);
-                            },
-                          ),
+                                )
+                              : Container(
+                                  margin:
+                                      EdgeInsets.only(top: Get.height * 0.24),
+                                  child: Text(
+                                    'No Task to Display',
+                                    style: TextStyle(
+                                      fontSize: Get.width * 0.07,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                         ),
                       )
-                    : Container(
-                        margin: EdgeInsets.only(top: Get.height * 0.24),
-                        child: Text(
-                          'No Task to Display',
-                          style: TextStyle(
-                            fontSize: Get.width * 0.07,
-                            color: Colors.grey,
-                          ),
+                    : const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.bluegrey,
                         ),
                       ),
               ),

@@ -1,10 +1,14 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+
 import 'package:todolistapp/view/display_task.dart';
-import 'package:todolistapp/view/add_Task.dart';
+
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(enabled: true, builder: (context) => const MyApp(),),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,9 +17,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
-      home: displayTask(),
+      home: const displayTask(),
     );
   }
 }

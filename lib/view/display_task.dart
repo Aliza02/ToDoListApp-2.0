@@ -45,23 +45,28 @@ class _displayTaskState extends State<displayTask> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    taskcontroller.fetching.value = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchData();
+    });
+    
   }
 
   void fetchData() async {
+    int index = 0;
     taskcontroller.toDotasks = await DatabaseHelper.queryPendingTasks();
+    // if(taskcontroller.toDotasks.isNotEmpty){}
 
-    taskcontroller.fetching.value = false;
-    for(int i=0; i<taskcontroller.toDotasks.length; i++){
-    Future.delayed(Duration(milliseconds: 100),(){
-listKey.currentState!.insertItem(i);
-    });  
-    }
+    taskcontroller.toDotasks.forEach((element) {
+      
+
+      listKey.currentState!.insertItem(index);
+      index++;
+    });
+
    
-    // listKey.currentState!.insertItem(
-    //   0,
-    //   duration: const Duration(seconds: 1),
-    // );
+
+   
   }
 
   @override
@@ -113,48 +118,53 @@ listKey.currentState!.insertItem(i);
                 ),
               ),
               Obx(
-                () => taskcontroller.fetching.value == false
+                () => taskcontroller.fetching.value==false
                     ? Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
-                          child: taskcontroller.toDotasks.isNotEmpty
-                              ? AnimatedList(
-                                  key: listKey,
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  initialItemCount:
-                                      taskcontroller.toDotasks.length,
-                                  itemBuilder: (context, index, animation) {
-                                    return list_item(
-                                        animation: animation,
-                                        onRemove: () {
-                                          removeTask(index);
-                                        },
-                                        index: index,
-                                        taskName: taskcontroller
-                                            .toDotasks[index].name);
+                          child: 
+                          AnimatedList(
+                            key: listKey,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            initialItemCount: taskcontroller.toDotasks.length,
+                            itemBuilder: (context, index, animation) {
+                              return list_item(
+                                  animation: animation,
+                                  onRemove: () {
+                                    removeTask(index);
                                   },
-                                )
-                              : Container(
-                                  margin:
-                                      EdgeInsets.only(top: Get.height * 0.24),
-                                  child: Text(
-                                    'No Task to Display',
-                                    style: TextStyle(
-                                      fontSize: Get.width * 0.07,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
+                                  index: index,
+                                  taskName:
+                                      taskcontroller.toDotasks[index].name);
+                            },
+                          ),
+                          
+                        
+                        ),
+                    ): Container(
+                              margin:
+                                  EdgeInsets.only(top: Get.height * 0.24),
+                              child: Text(
+                                'No Task to Display',
+                                style: TextStyle(
+                                  fontSize: Get.width * 0.07,
+                                  color: Colors.grey,
                                 ),
-                        ),
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.bluegrey,
-                        ),
-                      ),
+                              ),
+                            ),
               ),
+                    
+
+        
+                    // : const Center(
+                    //     child: Text('asdf'),
+                    //     // CircularProgressIndicator(
+                    //     //   color: AppColors.bluegrey,
+                    //     // ),
+                    //   ),
+              
             ],
           ),
         ),

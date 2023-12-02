@@ -28,9 +28,14 @@ class _list_itemState extends State<list_item> {
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
+      
       sizeFactor: widget.animation,
       child: Slidable(
+        closeOnScroll: true,
+        // groupTag: SlidableAutoCloseBehavior(),
+
         endActionPane: ActionPane(
+        
           motion: const ScrollMotion(),
           children: [
             InkWell(

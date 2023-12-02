@@ -19,12 +19,20 @@ class _completedTaskState extends State<completedTask> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    taskcontroller.fetching.value = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchData();
+    });
   }
 
   void fetchData() async {
     taskcontroller.completedTask = await DatabaseHelper.queryOnCompleteTask();
-    taskcontroller.fetching.value = false;
+    taskcontroller.completedTask.forEach((element) {
+      int index = 0;
+
+      listKey.currentState!.insertItem(index);
+      index++;
+    });
   }
 
   @override
@@ -34,9 +42,11 @@ class _completedTaskState extends State<completedTask> {
         appBar: AppBar(
           leading: InkWell(
             onTap: () {
+              taskcontroller.toDotasks.clear();
+              taskcontroller.completedTask.clear();
               Get.off(
                 () => const displayTask(),
-                duration: const Duration(seconds: 1),
+                duration: const Duration(milliseconds: 50),
                 transition: Transition.leftToRightWithFade,
               );
             },
@@ -78,37 +88,34 @@ class _completedTaskState extends State<completedTask> {
               Obx(
                 () => taskcontroller.fetching.value == false
                     ? Expanded(
-                        child: taskcontroller.completedTask.isNotEmpty
-                            ? AnimatedList(
-                                key: listKey,
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                initialItemCount:
-                                    taskcontroller.completedTask.length,
-                                itemBuilder: (context, index, animation) {
-                                  return item_card(
-                                    animation: animation,
-                                    cardText: taskcontroller
-                                        .completedTask[index].name,
-                                    fontSize: Get.width * 0.06,
-                                  );
-                                },
-                              )
-                            : Container(
-                                margin: EdgeInsets.only(top: Get.height * 0.24),
-                                child: Text(
-                                  'No Task to Display',
-                                  style: TextStyle(
-                                    fontSize: Get.width * 0.07,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: AnimatedList(
+                            key: listKey,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            initialItemCount:
+                                taskcontroller.completedTask.length,
+                            itemBuilder: (context, index, animation) {
+                              return item_card(
+                                animation: animation,
+                                cardText:
+                                    taskcontroller.completedTask[index].name,
+                                fontSize: Get.width * 0.06,
+                              );
+                            },
+                          ),
+                        ),
                       )
-                    : const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.bluegrey,
+                    : Container(
+                        margin: EdgeInsets.only(top: Get.height * 0.24),
+                        child: Text(
+                          'No Task to Display',
+                          style: TextStyle(
+                            fontSize: Get.width * 0.07,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
               ),

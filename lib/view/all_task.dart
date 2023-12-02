@@ -17,19 +17,24 @@ class all_tasks extends StatefulWidget {
 class _all_tasksState extends State<all_tasks> {
   final taskcontroller = Get.put(taskController());
   final GlobalKey<AnimatedListState> listKey = GlobalKey();
+  @override
   void initState() {
     super.initState();
-    fetchData();
+    taskcontroller.fetching.value = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchData();
+    });
   }
 
   void fetchData() async {
     taskcontroller.allTasks = await DatabaseHelper.queryAllTasks();
 
-    taskcontroller.fetching.value = false;
-    listKey.currentState!.insertItem(
-      0,
-      duration: const Duration(seconds: 1),
-    );
+    taskcontroller.allTasks.forEach((element) {
+      int index = 0;
+
+      listKey.currentState!.insertItem(index);
+      index++;
+    });
   }
 
   @override
@@ -39,9 +44,11 @@ class _all_tasksState extends State<all_tasks> {
         appBar: AppBar(
           leading: InkWell(
             onTap: () {
+              taskcontroller.toDotasks.clear();
+              taskcontroller.allTasks.clear();
               Get.off(
                 () => const displayTask(),
-                duration: const Duration(seconds: 1),
+                duration: const Duration(milliseconds: 50),
                 transition: Transition.rightToLeftWithFade,
               );
             },
@@ -83,80 +90,76 @@ class _all_tasksState extends State<all_tasks> {
               Obx(
                 () => taskcontroller.fetching.value == false
                     ? Expanded(
-                        child: taskcontroller.allTasks.isNotEmpty
-                            ? AnimatedList(
-                                key: listKey,
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                initialItemCount:
-                                    taskcontroller.allTasks.length,
-                                itemBuilder: (context, index, animation) {
-                                  return Container(
-                                    height: Get.height * 0.09,
-                                    margin: EdgeInsets.symmetric(
-                                      vertical: Get.width * 0.01,
-                                      horizontal: Get.width * 0.05,
+                        child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: AnimatedList(
+                          key: listKey,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          initialItemCount: taskcontroller.allTasks.length,
+                          itemBuilder: (context, index, animation) {
+                            return SizeTransition(
+                              sizeFactor: animation,
+                              child: Container(
+                                height: Get.height * 0.09,
+                                margin: EdgeInsets.symmetric(
+                                  vertical: Get.width * 0.01,
+                                  horizontal: Get.width * 0.05,
+                                ),
+                                decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
                                     ),
-                                    decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20),
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color.fromARGB(
-                                                255, 191, 200, 221),
-                                            blurRadius: 3.0,
-                                            spreadRadius: 1.0,
-                                            offset: Offset(2.0, 2.0),
-                                          ),
-                                        ]),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: Get.width * 0.05),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          card_text(
-                                            cardText: taskcontroller
-                                                .allTasks[index].name,
-                                            fontSize: Get.width * 0.06,
-                                          ),
-                                          Text(
-                                            taskcontroller
-                                                .allTasks[index].status,
-                                            style: TextStyle(
-                                              color: taskcontroller
-                                                          .allTasks[index]
-                                                          .status ==
-                                                      'pending'
-                                                  ? Colors.green
-                                                  : AppColors.bluegrey,
-                                              fontSize: Get.width * 0.03,
-                                            ),
-                                          ),
-                                        ],
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color.fromARGB(255, 191, 200, 221),
+                                        blurRadius: 3.0,
+                                        spreadRadius: 1.0,
+                                        offset: Offset(2.0, 2.0),
                                       ),
-                                    ),
-                                  );
-                                },
-                              )
-                            : Container(
-                                margin: EdgeInsets.only(top: Get.height * 0.24),
-                                child: Text(
-                                  'No Task to Display',
-                                  style: TextStyle(
-                                    fontSize: Get.width * 0.07,
-                                    color: Colors.grey,
+                                    ]),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: Get.width * 0.05),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      card_text(
+                                        cardText:
+                                            taskcontroller.allTasks[index].name,
+                                        fontSize: Get.width * 0.06,
+                                      ),
+                                      Text(
+                                        taskcontroller.allTasks[index].status,
+                                        style: TextStyle(
+                                          color: taskcontroller
+                                                      .allTasks[index].status ==
+                                                  'pending'
+                                              ? Colors.green
+                                              : AppColors.bluegrey,
+                                          fontSize: Get.width * 0.03,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.bluegrey,
+                            );
+                          },
+                        ),
+                      ))
+                    : Container(
+                        margin: EdgeInsets.only(top: Get.height * 0.24),
+                        child: Text(
+                          'No Task to Display',
+                          style: TextStyle(
+                            fontSize: Get.width * 0.07,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
               ),

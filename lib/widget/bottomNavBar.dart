@@ -27,20 +27,20 @@ class bottomNavBar extends StatelessWidget {
               color: AppColors.lightblue,
             ),
             onPressed: () async {
-              // taskcontroller.fetching.value = true;
+              taskcontroller.fetching.value = false;
               Get.off(
                 () => const all_tasks(),
-                duration: const Duration(milliseconds: 50),
+                duration: const Duration(milliseconds: 800),
                 transition: Transition.leftToRightWithFade,
               );
             },
           ),
           IconButton(
             onPressed: () {
-              // taskcontroller.fetching.value = true;
+              taskcontroller.fetching.value = false;
               Get.off(
                 () => const completedTask(),
-                duration: const Duration(milliseconds: 50),
+                duration: const Duration(milliseconds: 800),
                 transition: Transition.rightToLeftWithFade,
               );
             },

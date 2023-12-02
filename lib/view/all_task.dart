@@ -6,6 +6,8 @@ import 'package:todolistapp/controller/taskController.dart';
 import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/view/display_task.dart';
 import 'package:todolistapp/widget/card_text.dart';
+import 'package:todolistapp/widget/heading.dart';
+import 'package:todolistapp/widget/item_card.dart';
 
 class all_tasks extends StatefulWidget {
   const all_tasks({super.key});
@@ -20,7 +22,7 @@ class _all_tasksState extends State<all_tasks> {
   @override
   void initState() {
     super.initState();
-    taskcontroller.fetching.value = false;
+    // taskcontroller.fetching.value = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchData();
     });
@@ -28,7 +30,6 @@ class _all_tasksState extends State<all_tasks> {
 
   void fetchData() async {
     taskcontroller.allTasks = await DatabaseHelper.queryAllTasks();
-
     taskcontroller.allTasks.forEach((element) {
       int index = 0;
 
@@ -46,9 +47,10 @@ class _all_tasksState extends State<all_tasks> {
             onTap: () {
               taskcontroller.toDotasks.clear();
               taskcontroller.allTasks.clear();
+              taskcontroller.fetching.value = false;
               Get.off(
                 () => const displayTask(),
-                duration: const Duration(milliseconds: 50),
+                duration: const Duration(milliseconds: 800),
                 transition: Transition.rightToLeftWithFade,
               );
             },
@@ -75,18 +77,12 @@ class _all_tasksState extends State<all_tasks> {
           child: Column(
             children: [
               Container(
-                width: Get.width * 0.8,
-                height: Get.height * 0.07,
-                margin: EdgeInsets.only(top: Get.height * 0.08),
-                child: Text(
-                  'All Tasks!',
-                  style: TextStyle(
-                    fontSize: Get.width * 0.1,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.bluegrey,
-                  ),
-                ),
-              ),
+                  width: Get.width * 0.8,
+                  height: Get.height * 0.07,
+                  margin: EdgeInsets.only(top: Get.height * 0.08),
+                  child: const heading(
+                    pageTitle: 'All Tasks!',
+                  )),
               Obx(
                 () => taskcontroller.fetching.value == false
                     ? Expanded(
@@ -102,15 +98,19 @@ class _all_tasksState extends State<all_tasks> {
                             return SizeTransition(
                               sizeFactor: animation,
                               child: Container(
-                                height: Get.height * 0.09,
+                                width: Get.width * 0.9,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: Get.height * 0.02,
+                                  horizontal: Get.width * 0.03,
+                                ),
                                 margin: EdgeInsets.symmetric(
-                                  vertical: Get.width * 0.01,
+                                  vertical: Get.width * 0.02,
                                   horizontal: Get.width * 0.05,
                                 ),
                                 decoration: const BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.all(
-                                      Radius.circular(20),
+                                      Radius.circular(15),
                                     ),
                                     boxShadow: [
                                       BoxShadow(
@@ -121,31 +121,52 @@ class _all_tasksState extends State<all_tasks> {
                                         offset: Offset(2.0, 2.0),
                                       ),
                                     ]),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: Get.width * 0.05),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      card_text(
+                                child: Column(
+                                  // mainAxisAlignment:
+                                  //     MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      child: card_text(
                                         cardText:
                                             taskcontroller.allTasks[index].name,
                                         fontSize: Get.width * 0.06,
                                       ),
-                                      Text(
-                                        taskcontroller.allTasks[index].status,
-                                        style: TextStyle(
-                                          color: taskcontroller
-                                                      .allTasks[index].status ==
-                                                  'pending'
-                                              ? Colors.green
-                                              : AppColors.bluegrey,
-                                          fontSize: Get.width * 0.03,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          height: Get.height * 0.01,
+                                          width: Get.width * 0.02,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            color: taskcontroller
+                                                        .allTasks[index]
+                                                        .status ==
+                                                    'pending'
+                                                ? Colors.green
+                                                : AppColors.bluegrey,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                        SizedBox(
+                                          width: Get.width * 0.01,
+                                        ),
+                                        Text(
+                                          taskcontroller.allTasks[index].status,
+                                          style: TextStyle(
+                                            color: taskcontroller
+                                                        .allTasks[index]
+                                                        .status ==
+                                                    'pending'
+                                                ? Colors.green
+                                                : AppColors.bluegrey,
+                                            fontSize: Get.width * 0.03,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             );

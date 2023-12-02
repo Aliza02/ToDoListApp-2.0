@@ -29,8 +29,11 @@ class add_Task extends StatelessWidget {
               Container(
                 alignment: Alignment.center,
                 width: width,
-                height: height * 0.1,
+                padding: EdgeInsets.symmetric(horizontal: Get.width * 0.1),
+                // height: height * 0.1,
                 child: TextFormField(
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
                   controller: taskcontroller.taskTitle,
                   textAlign: TextAlign.center,
                   cursorColor: AppColors.bluegrey,
@@ -87,7 +90,7 @@ class add_Task extends StatelessWidget {
                     //   Task(taskcontroller.taskTitle.text,id,'pending'),
                     // );
                     taskcontroller.taskTitle.clear();
-
+                    taskcontroller.toDotasks.clear();
                     Get.off(() => displayTask());
                   },
                   icon: Icon(Icons.add),

@@ -5,6 +5,7 @@ import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/model/task.dart';
 
 import 'package:todolistapp/view/add_Task.dart';
+import 'package:todolistapp/widget/heading.dart';
 import 'package:todolistapp/widget/list_item.dart';
 
 import '../constants/colors.dart';
@@ -27,7 +28,7 @@ class _displayTaskState extends State<displayTask> {
     String removeItem = taskcontroller.toDotasks[index].name;
     if (taskcontroller.onRemove.value == true) {
       DatabaseHelper.delete(taskcontroller.toDotasks[index].id);
-    } else {
+    } else if (taskcontroller.onComplete.value == true) {
       DatabaseHelper.update(taskcontroller.toDotasks[index].id,
           taskcontroller.toDotasks[index].name);
     }
@@ -49,24 +50,20 @@ class _displayTaskState extends State<displayTask> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchData();
     });
-    
   }
 
   void fetchData() async {
     int index = 0;
     taskcontroller.toDotasks = await DatabaseHelper.queryPendingTasks();
+    if (taskcontroller.toDotasks.isEmpty) {
+      taskcontroller.fetching.value = true;
+    }
     // if(taskcontroller.toDotasks.isNotEmpty){}
 
     taskcontroller.toDotasks.forEach((element) {
-      
-
       listKey.currentState!.insertItem(index);
       index++;
     });
-
-   
-
-   
   }
 
   @override
@@ -97,14 +94,7 @@ class _displayTaskState extends State<displayTask> {
                 width: Get.width * 0.8,
                 height: Get.height * 0.07,
                 margin: EdgeInsets.only(top: Get.height * 0.08),
-                child: Text(
-                  'To Do',
-                  style: TextStyle(
-                    fontSize: Get.width * 0.1,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.bluegrey,
-                  ),
-                ),
+                child: const heading(pageTitle: 'To Do'),
               ),
               SizedBox(
                 width: Get.width * 0.8,
@@ -118,12 +108,11 @@ class _displayTaskState extends State<displayTask> {
                 ),
               ),
               Obx(
-                () => taskcontroller.fetching.value==false
+                () => taskcontroller.fetching.value == false
                     ? Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
-                          child: 
-                          AnimatedList(
+                          child: AnimatedList(
                             key: listKey,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
@@ -140,31 +129,26 @@ class _displayTaskState extends State<displayTask> {
                                       taskcontroller.toDotasks[index].name);
                             },
                           ),
-                          
-                        
                         ),
-                    ): Container(
-                              margin:
-                                  EdgeInsets.only(top: Get.height * 0.24),
-                              child: Text(
-                                'No Task to Display',
-                                style: TextStyle(
-                                  fontSize: Get.width * 0.07,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
+                      )
+                    : Container(
+                        margin: EdgeInsets.only(top: Get.height * 0.24),
+                        child: Text(
+                          'No Task to Display',
+                          style: TextStyle(
+                            fontSize: Get.width * 0.07,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
               ),
-                    
 
-        
-                    // : const Center(
-                    //     child: Text('asdf'),
-                    //     // CircularProgressIndicator(
-                    //     //   color: AppColors.bluegrey,
-                    //     // ),
-                    //   ),
-              
+              // : const Center(
+              //     child: Text('asdf'),
+              //     // CircularProgressIndicator(
+              //     //   color: AppColors.bluegrey,
+              //     // ),
+              //   ),
             ],
           ),
         ),

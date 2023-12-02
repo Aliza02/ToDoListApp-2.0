@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/controller/taskController.dart';
 import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/view/display_task.dart';
+import 'package:todolistapp/widget/heading.dart';
 import 'package:todolistapp/widget/item_card.dart';
+import 'package:todolistapp/widget/slidable_buttons.dart';
 
 class completedTask extends StatefulWidget {
   const completedTask({super.key});
@@ -19,7 +22,7 @@ class _completedTaskState extends State<completedTask> {
   @override
   void initState() {
     super.initState();
-    taskcontroller.fetching.value = false;
+    // taskcontroller.fetching.value = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchData();
     });
@@ -27,6 +30,9 @@ class _completedTaskState extends State<completedTask> {
 
   void fetchData() async {
     taskcontroller.completedTask = await DatabaseHelper.queryOnCompleteTask();
+    if (taskcontroller.completedTask.isEmpty) {
+      taskcontroller.fetching.value = true;
+    }
     taskcontroller.completedTask.forEach((element) {
       int index = 0;
 
@@ -44,9 +50,10 @@ class _completedTaskState extends State<completedTask> {
             onTap: () {
               taskcontroller.toDotasks.clear();
               taskcontroller.completedTask.clear();
+              taskcontroller.fetching.value = false;
               Get.off(
                 () => const displayTask(),
-                duration: const Duration(milliseconds: 50),
+                duration: const Duration(milliseconds: 800),
                 transition: Transition.leftToRightWithFade,
               );
             },
@@ -76,14 +83,7 @@ class _completedTaskState extends State<completedTask> {
                 width: Get.width * 0.8,
                 height: Get.height * 0.07,
                 margin: EdgeInsets.only(top: Get.height * 0.08),
-                child: Text(
-                  'Completed!',
-                  style: TextStyle(
-                    fontSize: Get.width * 0.1,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.bluegrey,
-                  ),
-                ),
+                child: const heading(pageTitle: 'Completed'),
               ),
               Obx(
                 () => taskcontroller.fetching.value == false
@@ -98,11 +98,41 @@ class _completedTaskState extends State<completedTask> {
                             initialItemCount:
                                 taskcontroller.completedTask.length,
                             itemBuilder: (context, index, animation) {
-                              return item_card(
-                                animation: animation,
-                                cardText:
-                                    taskcontroller.completedTask[index].name,
-                                fontSize: Get.width * 0.06,
+                              return Slidable(
+                                endActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          String removeItem = taskcontroller
+                                              .completedTask[index].name;
+                                          DatabaseHelper.delete(taskcontroller
+                                              .completedTask[index].id);
+                                          taskcontroller.completedTask
+                                              .removeAt(index);
+                                          listKey.currentState!.removeItem(
+                                              index,
+                                              (context, animation) => item_card(
+                                                  cardText: removeItem,
+                                                  fontSize: Get.width * 0.06,
+                                                  animation: animation));
+
+                                          if (taskcontroller
+                                              .completedTask.isEmpty) {
+                                            taskcontroller.fetching.value =
+                                                true;
+                                          }
+                                        },
+                                        child: const slidableButtons(
+                                            icon: Icons.delete),
+                                      ),
+                                    ]),
+                                child: item_card(
+                                  animation: animation,
+                                  cardText:
+                                      taskcontroller.completedTask[index].name,
+                                  fontSize: Get.width * 0.06,
+                                ),
                               );
                             },
                           ),

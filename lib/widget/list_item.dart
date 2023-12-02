@@ -5,6 +5,7 @@ import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/controller/taskController.dart';
 import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/widget/item_card.dart';
+import 'package:todolistapp/widget/slidable_buttons.dart';
 
 class list_item extends StatefulWidget {
   final String taskName;
@@ -28,67 +29,37 @@ class _list_itemState extends State<list_item> {
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
-      
       sizeFactor: widget.animation,
       child: Slidable(
-        closeOnScroll: true,
-        // groupTag: SlidableAutoCloseBehavior(),
-
+        groupTag: widget.index,
         endActionPane: ActionPane(
-        
           motion: const ScrollMotion(),
           children: [
             InkWell(
               onTap: () {
                 taskcontroller.onComplete.value = true;
                 widget.onRemove();
-                // taskcontroller.addCompletedTask(taskcontroller.tasks[index]);
-                // taskcontroller.tasks.removeAt(index);
+                if (taskcontroller.toDotasks.isEmpty) {
+                  taskcontroller.fetching.value = true;
+                }
+
+                taskcontroller.onComplete.value = false;
               },
-              child: Container(
-                width: Get.width * 0.15,
-                height: Get.height * 0.08,
-                decoration: const BoxDecoration(
-                  color: AppColors.bluegrey,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
-                child: const Icon(
-                  Icons.check,
-                  color: AppColors.lightblue,
-                ),
-              ),
+              child: const slidableButtons(icon: Icons.check),
             ),
             SizedBox(
               width: Get.width * 0.02,
             ),
             InkWell(
               onTap: () {
-                // taskcontroller.tasks.removeAt(widget.index);
                 taskcontroller.onRemove.value = true;
                 widget.onRemove();
-
                 if (taskcontroller.toDotasks.isEmpty) {
-                  // taskcontroller.fetching.value = true;
+                  taskcontroller.fetching.value = true;
                 }
-                // print(taskcontroller.tasks.length);
-                // print(widget.index);
+                taskcontroller.onRemove.value = false;
               },
-              child: Container(
-                width: Get.width * 0.15,
-                height: Get.height * 0.08,
-                decoration: const BoxDecoration(
-                  color: AppColors.bluegrey,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
-                child: const Icon(
-                  Icons.delete,
-                  color: AppColors.lightblue,
-                ),
-              ),
+              child: const slidableButtons(icon: Icons.delete),
             ),
           ],
         ),

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todolistapp/constants/colors.dart';
@@ -7,11 +6,9 @@ import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/view/display_task.dart';
 import 'package:todolistapp/widget/card_text.dart';
 import 'package:todolistapp/widget/heading.dart';
-import 'package:todolistapp/widget/item_card.dart';
 
 class all_tasks extends StatefulWidget {
   const all_tasks({super.key});
-
   @override
   State<all_tasks> createState() => _all_tasksState();
 }
@@ -22,7 +19,6 @@ class _all_tasksState extends State<all_tasks> {
   @override
   void initState() {
     super.initState();
-    // taskcontroller.fetching.value = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchData();
     });
@@ -32,7 +28,6 @@ class _all_tasksState extends State<all_tasks> {
     taskcontroller.allTasks = await DatabaseHelper.queryAllTasks();
     taskcontroller.allTasks.forEach((element) {
       int index = 0;
-
       listKey.currentState!.insertItem(index);
       index++;
     });
@@ -108,22 +103,20 @@ class _all_tasksState extends State<all_tasks> {
                                   horizontal: Get.width * 0.05,
                                 ),
                                 decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(15),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(15),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromARGB(255, 191, 200, 221),
+                                      blurRadius: 3.0,
+                                      spreadRadius: 1.0,
+                                      offset: Offset(2.0, 2.0),
                                     ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            Color.fromARGB(255, 191, 200, 221),
-                                        blurRadius: 3.0,
-                                        spreadRadius: 1.0,
-                                        offset: Offset(2.0, 2.0),
-                                      ),
-                                    ]),
+                                  ],
+                                ),
                                 child: Column(
-                                  // mainAxisAlignment:
-                                  //     MainAxisAlignment.spaceBetween,
                                   children: [
                                     SizedBox(
                                       child: card_text(

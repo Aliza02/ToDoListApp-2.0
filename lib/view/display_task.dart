@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/model/task.dart';
-
 import 'package:todolistapp/view/add_Task.dart';
 import 'package:todolistapp/widget/heading.dart';
 import 'package:todolistapp/widget/list_item.dart';
-
 import '../constants/colors.dart';
 import '../widget/bottomNavBar.dart';
 import '../controller/taskController.dart';
 
 class displayTask extends StatefulWidget {
   const displayTask({super.key});
-
   @override
   State<displayTask> createState() => _displayTaskState();
 }
@@ -32,7 +28,6 @@ class _displayTaskState extends State<displayTask> {
       DatabaseHelper.update(taskcontroller.toDotasks[index].id,
           taskcontroller.toDotasks[index].name);
     }
-
     taskcontroller.toDotasks.removeAt(index);
     listKey.currentState!.removeItem(
         index,
@@ -51,21 +46,18 @@ class _displayTaskState extends State<displayTask> {
       fetchData();
     });
   }
-
   void fetchData() async {
     int index = 0;
     taskcontroller.toDotasks = await DatabaseHelper.queryPendingTasks();
     if (taskcontroller.toDotasks.isEmpty) {
       taskcontroller.fetching.value = true;
     }
-    // if(taskcontroller.toDotasks.isNotEmpty){}
-
     taskcontroller.toDotasks.forEach((element) {
       listKey.currentState!.insertItem(index);
       index++;
-    });
+    },
+    );
   }
-
   @override
   void dispose() {
     super.dispose();
@@ -142,13 +134,6 @@ class _displayTaskState extends State<displayTask> {
                         ),
                       ),
               ),
-
-              // : const Center(
-              //     child: Text('asdf'),
-              //     // CircularProgressIndicator(
-              //     //   color: AppColors.bluegrey,
-              //     // ),
-              //   ),
             ],
           ),
         ),

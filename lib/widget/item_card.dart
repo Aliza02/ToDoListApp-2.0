@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/widget/card_text.dart';
 
 class item_card extends StatelessWidget {

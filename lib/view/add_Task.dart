@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/view/display_task.dart';
-
 import '../constants/colors.dart';
 import '../controller/taskController.dart';
 
@@ -30,7 +28,6 @@ class add_Task extends StatelessWidget {
                 alignment: Alignment.center,
                 width: width,
                 padding: EdgeInsets.symmetric(horizontal: Get.width * 0.1),
-                // height: height * 0.1,
                 child: TextFormField(
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
@@ -83,17 +80,12 @@ class add_Task extends StatelessWidget {
                       DatabaseHelper.task: taskcontroller.taskTitle.text,
                       DatabaseHelper.status: 'pending'
                     };
-
-                    final id = await dbHelper.insert(row);
-
-                    // taskcontroller.addTask(
-                    //   Task(taskcontroller.taskTitle.text,id,'pending'),
-                    // );
+                    await dbHelper.insert(row);
                     taskcontroller.taskTitle.clear();
                     taskcontroller.toDotasks.clear();
-                    Get.off(() => displayTask());
+                    Get.off(() => const displayTask());
                   },
-                  icon: Icon(Icons.add),
+                  icon: const Icon(Icons.add),
                   label: Text(
                     'Add to List',
                     style: TextStyle(

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-import 'package:todolistapp/constants/colors.dart';
 import 'package:todolistapp/controller/taskController.dart';
-import 'package:todolistapp/database/database_helper.dart';
 import 'package:todolistapp/widget/item_card.dart';
 import 'package:todolistapp/widget/slidable_buttons.dart';
 
